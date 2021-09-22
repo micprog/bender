@@ -1,0 +1,57 @@
+name: release
+
+# on:
+#   release:
+#     types: [created]
+
+on:
+  push:
+    branches: [ test_actions ]
+  pull_request:
+    branches: [ test_actions ]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rust:
+          - stable
+        allow_failures:
+          - rust: nightly
+        target:
+          - x86_64-linux-gnu-ubuntu16.04
+          - x86_64-linux-gnu-ubuntu18.04
+          - x86_64-linux-gnu-ubuntu20.04
+          - x86_64-linux-gnu-ubuntu20.10
+          - x86_64-linux-gnu-centos7.4.1708
+          - x86_64-linux-gnu-centos7.6.1810
+          - x86_64-linux-gnu-centos7.7.1908
+          - x86_64-linux-gnu-centos7.8.2003
+          - x86_64-linux-gnu-centos7.9.2009
+          - x86_64-linux-gnu-centos8.1.1911
+          - x86_64-linux-gnu-centos8.2.2004
+          - x86_64-linux-gnu
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ matrix.rust}}
+          override: true
+          components: rustfmt
+      - name: Release Build
+        run: cargo build --release
+      - run: .github/scripts/package.sh
+        shell: bash
+      - uses: actions/upload-artifact@v2
+        with:
+          name: bender_builds
+          path: target/
+      # - uses: actions/upload-release-asset@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     upload_url: ${{ github.event.release.upload_url }}
+      #     asset_path:
+
