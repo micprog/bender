@@ -2,6 +2,10 @@
 # Copyright (c) 2017-2018 ETH Zurich
 # Fabian Schuiki <fschuiki@iis.ee.ethz.ch>
 
+if [ -z "$TERM" ]; then
+	export TERM=xterm
+fi
+
 set -e
 CRST=`tput sgr0`
 CNAME=`tput bold`
