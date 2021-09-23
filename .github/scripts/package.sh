@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-if [[ "$GITHUB_REF" =~ ^v.*$ ]]; then
-    readonly pkgver="$(echo $GITHUB_REF | sed -n 's/^v//p')"
+if [[ "$GITHUB_REF" =~ ^refs/tags/v.*$ ]]; then
+    readonly pkgver="$(echo $GITHUB_REF | sed -n 's/^refs\/tags\/v//p')"
 else
-    readonly pkgver="$GITHUB_REF"
+    readonly pkgver="$(echo $GITHUB_REF | sed -n 's/^refs\/tags\///p')"
 fi
 
 if [ -z "$1" ]; then
