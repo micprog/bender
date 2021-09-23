@@ -24,10 +24,10 @@ jobs:
           override: true
           components: rustfmt
       - name: Build GNU
-        if: ${{ matrix.os == gnu }}
+        if: matrix.os == 'gnu'
         run: cargo build --release
       - name: Release Build
-        if: ${{ matrix.os != gnu }}
+        if: matrix.os != 'gnu'
         run: |
           export tgtname=$(echo ${{ matrix.os }} | tr -d ':')
           docker run \
@@ -36,10 +36,10 @@ jobs:
             -v "$GITHUB_WORKSPACE/target/$tgtname:/source/target" \
             accuminium/rust-${{ matrix.os }}_stable \
             cargo build --release;
-      - if: ${{ matrix.os == gnu }}
+      - if: matrix.os == 'gnu'
         run: .github/scripts/package.sh
         shell: bash
-      - if: ${{ matrix.os != gnu }}
+      - if: matrix.os != 'gnu'
         run: |
           tgtname=$(echo ${{ matrix.os }} | tr -d ':')
           .github/scripts/package.sh $tgtname;
