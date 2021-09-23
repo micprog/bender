@@ -1,14 +1,8 @@
 name: release
 
-# on:
-#   release:
-#     types: [created]
-
 on:
-  push:
-    branches: [ test_actions ]
-  pull_request:
-    branches: [ test_actions ]
+  release:
+    types: [created]
 
 jobs:
   release:
@@ -18,7 +12,7 @@ jobs:
         rust:
           - stable
     env:
-      PKG_OS: "centos:7.4.1708"
+      PKG_OS: "centos:7.4.1708 centos:7.6.1810 centos:7.7.1908 centos:7.8.2003 centos:8.1.1911 centos:8.2.2004 ubuntu:16.04 ubuntu:18.04 ubuntu:20.04 ubuntu:20.10"
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
@@ -32,7 +26,6 @@ jobs:
       - name: All OSes
         run: |
           for os in ${{ env.PKG_OS }}; do
-            echo $os
             export tgtname=$(echo $os | tr -d ':')
             docker run \
               -t --rm \
@@ -41,16 +34,19 @@ jobs:
               accuminium/rust-${os}_stable \
               cargo build --release;
           done
-      # - run: .github/scripts/package.sh
-      #   shell: bash
-      - uses: actions/upload-artifact@v2
+      - run: .github/scripts/package.sh
+        shell: bash
+      - run: |
+          for os in ${{ env.PKG_OS }}; do
+            export tgtname=$(echo $os | tr -d ':')
+            .github/scripts/package.sh $tgtname;
+          done
+      - uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: bender_builds
-          path: target/
-      # - uses: actions/upload-release-asset@v1
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   with:
-      #     upload_url: ${{ github.event.release.upload_url }}
-      #     asset_path:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./bender-*.tar.gz
+          asset_name: bender-*.tar.gz
+          asset_content_type: application/tar.gz
 
