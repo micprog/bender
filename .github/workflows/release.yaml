@@ -24,14 +24,14 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: ${{ matrix.rust}}
+          toolchain: ${{ matrix.rust }}
           override: true
           components: rustfmt
       - name: Release Build
         run: cargo build --release
       - name: All OSes
         run: |
-          for os in $env.PKG_OS; do
+          for os in ${{ env.PKG_OS }}; do
             echo $os
             export tgtname=$(echo $os | tr -d ':')
             docker run \
