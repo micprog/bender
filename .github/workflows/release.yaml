@@ -42,8 +42,8 @@ jobs:
           components: rustfmt
       - name: Release Build
         run: cargo build --release
-      - run: .github/scripts/package.sh
-        shell: bash
+      # - run: .github/scripts/package.sh
+      #   shell: bash
       - uses: actions/upload-artifact@v2
         with:
           name: bender_builds
