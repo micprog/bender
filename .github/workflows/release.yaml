@@ -12,9 +12,9 @@ jobs:
         rust:
           - stable
         os:
-          - "gnu"
-          - "centos:7.4.1708"
-          - "centos:7.6.1810"
+          - gnu
+          - centos:7.4.1708
+          - centos:7.6.1810
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
