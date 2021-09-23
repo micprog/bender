@@ -33,11 +33,11 @@ jobs:
         run: |
           for os in $env.PKG_OS; do
             tgtname=$(echo $os | tr -d ':')
-            docker run 
-              -t --rm
-              -v "$PWD:/source"
-              -v "$PWD/target/$tgtname:/source/target"
-              accuminium/rust-${os}_stable
+            docker run \
+              -t --rm \
+              -v "$PWD:/source" \
+              -v "$PWD/target/$tgtname:/source/target" \
+              accuminium/rust-${os}_stable \
               cargo build --release;
           done
       # - run: .github/scripts/package.sh
