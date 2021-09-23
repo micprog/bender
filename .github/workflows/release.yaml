@@ -17,21 +17,8 @@ jobs:
       matrix:
         rust:
           - stable
-        allow_failures:
-          - rust: nightly
-        target:
-          - x86_64-linux-gnu-ubuntu16.04
-          - x86_64-linux-gnu-ubuntu18.04
-          - x86_64-linux-gnu-ubuntu20.04
-          - x86_64-linux-gnu-ubuntu20.10
-          - x86_64-linux-gnu-centos7.4.1708
-          - x86_64-linux-gnu-centos7.6.1810
-          - x86_64-linux-gnu-centos7.7.1908
-          - x86_64-linux-gnu-centos7.8.2003
-          - x86_64-linux-gnu-centos7.9.2009
-          - x86_64-linux-gnu-centos8.1.1911
-          - x86_64-linux-gnu-centos8.2.2004
-          - x86_64-linux-gnu
+    env:
+      PKG_OS: "centos:7.4.1708 centos:7.6.1810 centos:7.7.1908 centos:7.8.2003 centos:8.1.1911 centos:8.2.2004 ubuntu:16.04 ubuntu:18.04 ubuntu:20.04 ubuntu:20.10"
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
@@ -42,6 +29,17 @@ jobs:
           components: rustfmt
       - name: Release Build
         run: cargo build --release
+      - name: All OSes
+        run: |
+          for os in $env.PKG_OS; do
+            tgtname=$(echo $os | tr -d ':')
+            docker run 
+              -t --rm
+              -v "$PWD:/source"
+              -v "$PWD/target/$tgtname:/source/target"
+              accuminium/rust-${os}_stable
+              cargo build --release;
+          done
       # - run: .github/scripts/package.sh
       #   shell: bash
       - uses: actions/upload-artifact@v2
