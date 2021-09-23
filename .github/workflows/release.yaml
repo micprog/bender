@@ -11,8 +11,10 @@ jobs:
       matrix:
         rust:
           - stable
-    env:
-      PKG_OS: "centos:7.4.1708 centos:7.6.1810"
+        os:
+          - "gnu"
+          - "centos:7.4.1708"
+          - "centos:7.6.1810"
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
@@ -21,32 +23,38 @@ jobs:
           toolchain: ${{ matrix.rust }}
           override: true
           components: rustfmt
-      - name: Release Build
+      - name: Build GNU
+        if: ${{ matrix.os == "gnu" }}
         run: cargo build --release
-      - name: All OSes
+      - name: Release Build
+        if: ${{ matrix.os != "gnu" }}
         run: |
-          for os in ${{ env.PKG_OS }}; do
-            export tgtname=$(echo $os | tr -d ':')
-            docker run \
-              -t --rm \
-              -v "$GITHUB_WORKSPACE:/source" \
-              -v "$GITHUB_WORKSPACE/target/$tgtname:/source/target" \
-              accuminium/rust-${os}_stable \
-              cargo build --release;
-          done
-      - run: .github/scripts/package.sh
+          export tgtname=$(echo ${{ matrix.os }} | tr -d ':')
+          docker run \
+            -t --rm \
+            -v "$GITHUB_WORKSPACE:/source" \
+            -v "$GITHUB_WORKSPACE/target/$tgtname:/source/target" \
+            accuminium/rust-${{ matrix.os }}_stable \
+            cargo build --release;
+      - if: ${{ matrix.os == "gnu" }}
+        run: .github/scripts/package.sh
         shell: bash
-      - run: |
-          for os in ${{ env.PKG_OS }}; do
-            export tgtname=$(echo $os | tr -d ':')
-            .github/scripts/package.sh $tgtname;
-          done
+      - if: ${{ matrix.os != "gnu" }}
+        run: |
+          tgtname=$(echo ${{ matrix.os }} | tr -d ':')
+          .github/scripts/package.sh $tgtname;
+      - name: get artifact name
+        run: |
+          ARTIFACT_PATHNAME=$(ls ./bender-*.tar.gz | head -n 1)
+          ARTIFACT_NAME=$(basename $ARTIFACT_PATHNAME)
+          echo ::set-env name=ARTIFACT_NAME::${ARTIFACT_NAME}
+          echo ::set-env name=ARTIFACT_PATHNAME::${ARTIFACT_PATHNAME}
       - uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./bender-*.tar.gz
-          asset_name: bender-*.tar.gz
+          asset_path: ${{ env.ARTIFACT_PATHNAME }}
+          asset_name: ${{ env.ARTIFACT_NAME }}
           asset_content_type: application/tar.gz
 
