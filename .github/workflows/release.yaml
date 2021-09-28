@@ -27,6 +27,8 @@ jobs:
           - ubuntu:20.04
           - ubuntu:20.10
           - fedora:34
+      allow_failures:
+        - os: fedora:34
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
