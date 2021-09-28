@@ -2,7 +2,7 @@ name: ci
 
 on:
   push:
-    branches: [ try_fedora ]
+    branches: [ master ]
   pull_request:
     branches: [ master ]
 
