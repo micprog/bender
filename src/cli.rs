@@ -5,6 +5,7 @@
 
 use std;
 use std::fs::{canonicalize, metadata};
+use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::process::Command as SysCommand;
 
@@ -124,7 +125,10 @@ pub fn main() -> Result<()> {
     // Read the existing lockfile.
     let lock_path = root_dir.join("Bender.lock");
     let locked_existing = if lock_path.exists() {
-        Some(read_lockfile(&lock_path)?)
+        Some(match read_lockfile(&lock_path) {
+            Ok(lockfile) => lockfile,
+            Err(_) => lockfile_fix(&lock_path)?,
+        })
     } else {
         None
     };
@@ -395,6 +399,26 @@ fn read_lockfile(path: &Path) -> Result<Locked> {
     let file = File::open(path)
         .map_err(|cause| Error::chain(format!("Cannot open lockfile {:?}.", path), cause))?;
     serde_yaml::from_reader(file)
+        .map_err(|cause| Error::chain(format!("Syntax error in lockfile {:?}.", path), cause))
+}
+
+/// Fix a lock file
+fn lockfile_fix(path: &Path) -> Result<Locked> {
+    // Due to an update in the YAML parser, an incompatability was introduced
+    // This function modifies enum variants with the necessary `!Tag`
+    use std::fs::File;
+    let mut file = File::open(path)
+        .map_err(|cause| Error::chain(format!("Cannot open lockfile {:?}.", path), cause))?;
+    let mut data = String::new();
+    file.read_to_string(&mut data)
+        .map_err(|cause| Error::chain(format!("Cannot parse lockfile {:?}.", path), cause))?;
+    drop(file);
+
+    let data = data.replace("Git:", "!Git");
+    let data = data.replace("Path:", "!Path");
+    let data = data.replace("Registry:", "!Registry");
+
+    serde_yaml::from_str(&data)
         .map_err(|cause| Error::chain(format!("Syntax error in lockfile {:?}.", path), cause))
 }
 
