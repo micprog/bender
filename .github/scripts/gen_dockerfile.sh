@@ -15,6 +15,9 @@ fi
 if [ $(echo $full_tgtname | cut -d ':' -f 1) = "fedora" ]; then
   echo 'RUN dnf -y update && dnf -y install @development-tools' >> $filename
 fi
+if [ $(echo $full_tgtname | cut -d ':' -f 1) = "debian" ]; then
+  echo 'RUN apt update && apt -y install build-essential curl gcc make' >> $filename
+fi
 echo >> $filename
 echo 'ENV RUSTUP_HOME=/usr/local/rustup CARGO_HOME=/usr/local/cargo' >> $filename
 echo 'ENV PATH $CARGO_HOME/bin:$PATH' >> $filename

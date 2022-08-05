@@ -25,6 +25,8 @@ jobs:
           - ubuntu:21.10
           - fedora:34
           - fedora:35
+          - debian:10
+          - debian:11
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
