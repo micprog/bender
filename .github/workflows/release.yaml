@@ -1,8 +1,10 @@
 name: release
 
 on:
-  release:
-    types: [created]
+  push:
+    tags:
+      - '*'
+  workflow_dispatch:
 
 jobs:
   release:
@@ -13,7 +15,7 @@ jobs:
         rust:
           - stable
         os:
-          - gnu
+          - ubuntu-latest
           - centos:7.4.1708
           - centos:7.6.1810
           - centos:7.7.1908
@@ -26,6 +28,7 @@ jobs:
           - fedora:36
           - debian:10
           - debian:11
+    container: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
@@ -34,29 +37,17 @@ jobs:
           toolchain: ${{ matrix.rust }}
           override: true
           components: rustfmt
-      - name: GNU Build
-        if: matrix.os == 'gnu'
-        run: cargo build --release
-      - name: OS Build
-        if: matrix.os != 'gnu'
-        run: |
-          export full_tgtname=${{ matrix.os }}
-          export tgtname=$(echo ${{ matrix.os }} | tr -d ':')
-          .github/scripts/gen_dockerfile.sh
-          docker build ./ -t $tgtname
-          docker run \
-            -t --rm \
-            -v "$GITHUB_WORKSPACE:/source" \
-            -v "$GITHUB_WORKSPACE/target/$tgtname:/source/target" \
-            $tgtname \
-            cargo build --release;
-        shell: bash
+      - name: Build
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release
       - name: GNU Create Package
-        if: matrix.os == 'gnu'
+        if: matrix.os == 'ubuntu-latest'
         run: .github/scripts/package.sh
         shell: bash
       - name: OS Create Package
-        if: matrix.os != 'gnu'
+        if: matrix.os != 'ubuntu-latest'
         run: |
           tgtname=$(echo ${{ matrix.os }} | tr -d ':')
           .github/scripts/package.sh $tgtname;
@@ -69,12 +60,9 @@ jobs:
           echo "ARTIFACT_PATHNAME=${ARTIFACT_PATHNAME}" >> $GITHUB_ENV
         shell: bash
       - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: ${{ env.ARTIFACT_PATHNAME }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ${{ env.ARTIFACT_PATHNAME }}
-          asset_name: ${{ env.ARTIFACT_NAME }}
-          asset_content_type: application/tar.gz
-
