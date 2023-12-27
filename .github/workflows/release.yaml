@@ -140,6 +140,7 @@ jobs:
         run: |
           tar -czf $ARTIFACT_PATHNAME -C "./target/universal2-apple-darwin/release" --owner=0 --group=0 bender
                 - name: Upload Release Asset
+      - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
