@@ -122,16 +122,19 @@ jobs:
           curl --proto '=https' --tlsv1.2 -sSf https://https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
           echo "${CARGO_HOME:-$HOME/.cargo}/bin" >> $GITHUB_PATH
       - name: universal2 install
-        run: cargo install universal2
+        run: |
+          rustup target add x86_64-apple-darwin
+          rustup target add aarch64-apple-darwin
+          cargo install universal2
       - name: MacOS Build
         run: cargo universal2 --release
       - name: Get Artifact Name
         run: |
-          if [[ "$GITHUB_REF" =~ ^refs/tags/v.*$ ]]; then
-            PKG_VERSION=$(echo $GITHUB_REF | sed -n 's/^refs\/tags\/v//p')
-          else
-            PKG_VERSION=$(echo $GITHUB_REF | sed -n 's/^refs\/tags\///p')
-          end
+          if [[ "$GITHUB_REF" =~ ^refs/tags/v.*$ ]]; then; \
+            PKG_VERSION=$(echo $GITHUB_REF | sed -n 's/^refs\/tags\/v//p'); \
+          else; \
+            PKG_VERSION=$(echo $GITHUB_REF | sed -n 's/^refs\/tags\///p'); \
+          fi
           ARTIFACT_PATHNAME="bender-$PKG_VERSION-universal-darwin.tar.gz"
           ARTIFACT_NAME=$(basename $ARTIFACT_PATHNAME)
           echo "ARTIFACT_NAME=${ARTIFACT_NAME}" >> $GITHUB_ENV
