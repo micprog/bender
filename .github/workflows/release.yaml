@@ -130,9 +130,9 @@ jobs:
         run: cargo universal2 --release
       - name: Get Artifact Name
         run: |
-          if [[ "$GITHUB_REF" =~ ^refs/tags/v.*$ ]]; then; \
+          if [[ "$GITHUB_REF" =~ ^refs/tags/v.*$ ]]; then \
             PKG_VERSION=$(echo $GITHUB_REF | sed -n 's/^refs\/tags\/v//p'); \
-          else; \
+          else \
             PKG_VERSION=$(echo $GITHUB_REF | sed -n 's/^refs\/tags\///p'); \
           fi
           ARTIFACT_PATHNAME="bender-$PKG_VERSION-universal-darwin.tar.gz"
