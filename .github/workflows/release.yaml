@@ -141,7 +141,7 @@ jobs:
           echo "ARTIFACT_PATHNAME=${ARTIFACT_PATHNAME}" >> $GITHUB_ENV
       - name: Create Package
         run: |
-          tar -czf $ARTIFACT_PATHNAME -C "./target/universal2-apple-darwin/release" --owner=0 --group=0 bender
+          tar -czf $ARTIFACT_PATHNAME -C "./target/universal2-apple-darwin/release" --uid=0 --gid=0 bender
                 - name: Upload Release Asset
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
