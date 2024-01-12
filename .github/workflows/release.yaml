@@ -175,7 +175,9 @@ jobs:
           echo "ARTIFACT_PATHNAME=${ARTIFACT_PATHNAME}" >> $GITHUB_ENV
       - name: Create Package
         run: |
-          tar -czf $ARTIFACT_PATHNAME -C "./target/x86_64-pc-windows-msvc/release" --owner=0 --group=0 bender
+          mkdir release
+          cp .\target\release\bender.exe release
+          tar -czf $ARTIFACT_PATHNAME -C "./release" --owner=0 --group=0 bender
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
