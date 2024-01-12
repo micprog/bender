@@ -177,6 +177,7 @@ jobs:
         run: |
           cp target/release/bender.exe .
           & 'C:\Program Files\Git\usr\bin\tar.exe' czf $ARTIFACT_PATHNAME --owner=0 --group=0 bender.exe
+          ls
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
