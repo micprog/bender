@@ -33,7 +33,7 @@ if [ $(echo $full_tgtname | cut -d ':' -f 1) = "debian" ]; then
 fi
 if [ $(echo $full_tgtname | cut -d ':' -f 1) = "almalinux" ]; then
   if [ $(echo $full_tgtname | cut -d ':' -f 2 | cut -d '.' -f 1) = '8' ]; then
-    echo 'RUN rpm --import https://repo.almalinux.org/almalinux/RPM-GPG-KEY-AlmaLinux'
+    echo 'RUN rpm --import https://repo.almalinux.org/almalinux/RPM-GPG-KEY-AlmaLinux' >> $filename
   fi
   echo 'RUN dnf -y update && dnf -y group install "Development Tools"' >> $filename
 fi
