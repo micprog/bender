@@ -114,7 +114,7 @@ jobs:
             -t --rm \
             -v "$GITHUB_WORKSPACE:/source" \
             -v "$GITHUB_WORKSPACE/target/:/source/target" \
-            manulinux
+            manylinux
             cargo build --release;
       - name: GNU Create Package
         run: .github/scripts/package.sh
