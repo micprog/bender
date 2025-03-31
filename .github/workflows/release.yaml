@@ -22,9 +22,10 @@ jobs:
           - ubuntu:18.04
           - ubuntu:20.04
           - ubuntu:22.04
-          - fedora:37
-          - fedora:38
+          - ubuntu:24.04
           - fedora:39
+          - fedora:40
+          - fedora:41
           - debian:10
           - debian:11
           - debian:12
@@ -32,20 +33,26 @@ jobs:
           - rhel:8.7
           - rhel:8.8
           - rhel:8.9
+          - rhel:8.10
           - rhel:9.0
           - rhel:9.1
           - rhel:9.2
           - rhel:9.3
+          - rhel:9.4
+          - rhel:9.5
           - almalinux:8.6
           - almalinux:8.7
           - almalinux:8.8
           - almalinux:8.9
+          - almalinux:8.10
           - almalinux:9.0
           - almalinux:9.1
           - almalinux:9.2
           - almalinux:9.3
+          - almalinux:9.4
+          - almalinux:9.5
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: OS Build
         run: |
           export full_tgtname=${{ matrix.os }}
@@ -87,7 +94,7 @@ jobs:
     # Use container that supports old GLIBC versions and (hopefully) many linux OSs
     # container: quay.io/pypa/manylinux2014_x86_64
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup Dockerfile
         run: |
           touch Dockerfile
@@ -140,7 +147,7 @@ jobs:
     strategy:
       fail-fast: true
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install Rust
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
@@ -178,7 +185,7 @@ jobs:
   release-windows:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
         with:
