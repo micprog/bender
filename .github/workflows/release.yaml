@@ -113,7 +113,7 @@ jobs:
           docker run \
             -t --rm \
             -v "$GITHUB_WORKSPACE:/source" \
-            -v "$GITHUB_WORKSPACE/target/:/source/target" \
+            -v "$GITHUB_WORKSPACE/target:/source/target" \
             manylinux
             cargo build --release;
       - name: GNU Create Package
