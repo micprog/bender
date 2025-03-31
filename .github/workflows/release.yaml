@@ -117,22 +117,13 @@ jobs:
       - name: GNU Create Package
         run: .github/scripts/package.sh
         shell: bash
-      - name: Get Artifact Name
-        run: |
-          ARTIFACT_PATHNAME=$(ls ./bender-*.tar.gz | head -n 1)
-          ARTIFACT_NAME=$(basename $ARTIFACT_PATHNAME)
-          echo "ARTIFACT_NAME=${ARTIFACT_NAME}" >> $GITHUB_ENV
-          echo "ARTIFACT_PATHNAME=${ARTIFACT_PATHNAME}" >> $GITHUB_ENV
-        shell: bash
       - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.event.release.tag_name }}
+          files: bender-*.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ${{ env.ARTIFACT_PATHNAME }}
-          asset_name: ${{ env.ARTIFACT_NAME }}
-          asset_content_type: application/tar.gz
   release-macos:
     runs-on: macos-latest
     strategy:
@@ -165,14 +156,12 @@ jobs:
         run: |
           gtar -czf $ARTIFACT_PATHNAME -C "./target/universal2-apple-darwin/release" --owner=0 --group=0 bender
       - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.event.release.tag_name }}
+          files: bender-*.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ${{ env.ARTIFACT_PATHNAME }}
-          asset_name: ${{ env.ARTIFACT_NAME }}
-          asset_content_type: application/tar.gz
   release-windows:
     runs-on: windows-latest
     steps:
@@ -200,11 +189,9 @@ jobs:
           cp target/release/bender.exe .
           & 'C:\Program Files\Git\usr\bin\tar.exe' czf $Env:ARTIFACT_PATHNAME --owner=0 --group=0 bender.exe
       - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.event.release.tag_name }}
+          files: bender-*.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ${{ env.ARTIFACT_PATHNAME }}
-          asset_name: ${{ env.ARTIFACT_NAME }}
-          asset_content_type: application/tar.gz
