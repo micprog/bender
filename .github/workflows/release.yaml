@@ -71,13 +71,6 @@ jobs:
           tgtname=$(echo ${{ matrix.os }} | tr -d ':')
           .github/scripts/package.sh $tgtname;
         shell: bash
-      # - name: Get Artifact Name
-      #   run: |
-      #     ARTIFACT_PATHNAME=$(ls ./bender-*.tar.gz | head -n 1)
-      #     ARTIFACT_NAME=$(basename $ARTIFACT_PATHNAME)
-      #     echo "ARTIFACT_NAME=${ARTIFACT_NAME}" >> $GITHUB_ENV
-      #     echo "ARTIFACT_PATHNAME=${ARTIFACT_PATHNAME}" >> $GITHUB_ENV
-        shell: bash
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v1
         with:
@@ -85,15 +78,6 @@ jobs:
           files: bender-*.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      # - name: Upload Release Asset
-      #   uses: actions/upload-release-asset@v1
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   with:
-      #     upload_url: ${{ github.event.release.upload_url }}
-      #     asset_path: ${{ env.ARTIFACT_PATHNAME }}
-      #     asset_name: ${{ env.ARTIFACT_NAME }}
-      #     asset_content_type: application/tar.gz
   release-gnu:
     runs-on: ubuntu-latest
     strategy: 
